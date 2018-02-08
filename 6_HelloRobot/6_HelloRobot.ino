@@ -26,10 +26,10 @@ MeLineFollower lineFinder(PORT_2); // Black line finder sensor
  * S1_OUT_S2_IN
  * S1_OUT_S2_OUT
  */
+MeLEDMatrix Matrix_1(PORT_4); // LED matrix
 
 /***** On Board LED and sensors objects declaration *****/ 
 MeRGBLed led(0, 30); // RGB LEDs
-const int LED_PIN = 13; // Pin 13 is the internal one to which are connected
 /* led.setColorAt(0/1, 255, 0, 0); // LED0 (RGBLED1) (RightSide), LED1 (RGBLED2) (LeftSide)
  *  // 0-255 for each of 3 positions: Red, Green, Blue
  *  led.show(); // Make the LED on
@@ -75,13 +75,12 @@ void setup()
 {
   Serial.begin(9600); 
 
-  led.setpin(LED_PIN); // Does it work with LED_BUILTIN?????????????????????????
-  /*
-   * ?????????????????????????????????????????
-   */
+  Matrix_1.setBrightness(Brightness_8);
+  led.setpin(LED_BUILTIN); // = led.setpin(LED_BUILTIN); and no need of defining LED_PIN constant
+  
   led.setColorAt(0, 255, 0, 0); //Set LED0 (RGBLED1) (RightSide) to Red
   led.setColorAt(1, 0, 0, 255); //Set LED1 (RGBLED2) (LeftSide)  to Blue
-
+  led.show();                  
 
   Serial.println("Waiting for a sensor to detect blocked reflection");
 }
@@ -101,13 +100,23 @@ void loop()
 // function to indicate numbers by flashing the built-in LED
 void blinkNumber( byte number) {
    while(number--) {
-     led.setColorAt(0, 255,255,255); // White to correspond wit HIGH
-     led.setColorAt(0, 255,255,255);
-     led.show(); delay(100);
-     led.setColorAt(0, 0,0,0); // Black to correspond wit HIGH
-     led.setColorAt(1, 0,0,0);
-     led.show(); delay(400);
+    // Conver number to char array in order to can show it in the LED matrix
+    char data[1];
+    itoa(number,data,10);
+    Serial.println(data);
+    Matrix_1.drawStr(5,7,data);
+
+    //And blink the RGB LEDs
+    led.setColorAt(0, 255,255,255); // WHITE to correspond wit HIGH
+    led.setColorAt(1, 255,255,255);
+    led.show(); delay(100);
+    led.setColorAt(0, 255,0,0); // RED to correspond wit LOW
+    led.setColorAt(1, 255,0,0);
+    led.show(); delay(400);
    }
+  led.setColorAt(0, 0,0,255); // Stay BLUE meanwhile
+  led.setColorAt(1, 0,0,255);
+  led.show();
 }
 
 /**********************
@@ -217,6 +226,8 @@ int irSensorReflect[NBR_SENSORS]; // value considered detecting an object
 int irSensorEdge[NBR_SENSORS];    // value considered detecting an edge
 boolean isDetected[NBR_SENSORS] = {false,false}; // set true if object detected
 
+/* SOLO PARA EL CASO EN QUE TUVIESEMOS VALORES ANALÓGICOS
+ *  
 const int irReflectThreshold = 10; // % level below ambient to trigger reflection
 const int irEdgeThreshold    = 90; // % level above ambient to trigger edge
 
@@ -235,6 +246,7 @@ void irSensorCalibrate(byte sensor)
   irSensorReflect[sensor] = (ambient * (long)(100-irReflectThreshold)) / 100;
   irSensorEdge[sensor]    = (ambient * (long)(100+irEdgeThreshold)) / 100; 
 }
+*/
 
 // returns true if an object reflection detected on the given sensor
 // the sensor parameter is the index into the sensor array
