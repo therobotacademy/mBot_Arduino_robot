@@ -26,6 +26,12 @@ MeLineFollower lineFinder(PORT_2); // Black line finder sensor
  * S1_OUT_S2_IN
  * S1_OUT_S2_OUT
  */
+// Use this alternative definition for better understanding of code
+#define Left_BLACK_Right_BLACK  (0x00)    // sensor1 and sensor2 are both inside of black line
+#define Left_BLACK_Right_WHITE  (0x01)    // sensor1 is inside of black line and sensor2 is outside of black line
+#define Left_WHITE_Right_BLACK  (0x02)    // sensor1 is outside of black line and sensor2 is inside of black line
+#define Left_WHITE_Right_WHITE (0x03)    // sensor1 and sensor2 are both outside of black line
+ 
 MeLEDMatrix Matrix_1(PORT_4); // LED matrix
 
 /***** On Board LED and sensors objects declaration *****/ 
